@@ -1,0 +1,49 @@
+Создать тестовый nginx server с деплоем измений по пушу кода в мастер ветку github
+=====================================
+Развернуть Nginx контецнер на  EC2 инстансе
+Cборку осуществлять с помощью jenkins через Jenkinsfile
+Этапы сборки Jenkinsfile:
+  Build
+    Cборка последней версии nginx сервера c lua-nginx-module
+  Dockerize
+      Сборка докер контейнера с добавленим в образ nginx.conf и index.html файлов из репозитория github
+      Публикация докер образа в публичный докер репозиторий
+  Deploy
+    Разворачивание на EC2 инстансе через docker-machine
+
+Jenkinsfile:
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building..'
+		git clone https://github.com/danday74/docker-nginx-lua.git
+		cd docker-nginx-lua/
+		sudo docker build -t "dadday74/nginx-lua" .
+		export DOCKER_ID_USER="etyatin"
+		sudo docker login
+		docker tag my_image $DOCKER_ID_USER/my_image
+		docker push $DOCKER_ID_USER/my_image
+		
+		
+
+            }
+        }
+        stage('Test') {
+            steps {
+                echo 'Testing..'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo 'Deploying....'
+            }
+        }
+    }
+}
+
+Код разместить в github
+Запуск пересборки осуществлять по пушу кода в мастер ветку репозитория
+Спасибо.
