@@ -26,6 +26,13 @@ pipeline {
 		sudo docker login
 		docker tag my_image $DOCKER_ID_USER/my_image
 		docker push $DOCKER_ID_USER/my_image
+		docker-machine create --driver amazonec2 --amazonec2-open-port 8000 --amazonec2-region us-west-1 aws-sandbox
+		git url: 'https://github.com/etyatin/docker.git'
+		commitChangeset = sh(returnStdout: true, script: 'git diff-tree --no-commit-id --name-status -r HEAD').trim()
+		withCredentials([usernamePassword(credentialsId: 'git-pass-credentials-ID', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+    sh("git tag -a some_tag -m 'Jenkins'")
+    sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@<REPO> --tags')
+		
 		
 		
 
