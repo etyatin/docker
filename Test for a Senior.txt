@@ -1,16 +1,3 @@
-Создать тестовый nginx server с деплоем измений по пушу кода в мастер ветку github
-=====================================
-Развернуть Nginx контецнер на  EC2 инстансе
-Cборку осуществлять с помощью jenkins через Jenkinsfile
-Этапы сборки Jenkinsfile:
-  Build
-    Cборка последней версии nginx сервера c lua-nginx-module
-  Dockerize
-      Сборка докер контейнера с добавленим в образ nginx.conf и index.html файлов из репозитория github
-      Публикация докер образа в публичный докер репозиторий
-  Deploy
-    Разворачивание на EC2 инстансе через docker-machine
-
 Jenkinsfile:
 pipeline {
     agent any
@@ -31,11 +18,7 @@ pipeline {
 		commitChangeset = sh(returnStdout: true, script: 'git diff-tree --no-commit-id --name-status -r HEAD').trim()
 		withCredentials([usernamePassword(credentialsId: 'git-pass-credentials-ID', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
     sh("git tag -a some_tag -m 'Jenkins'")
-    sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@<REPO> --tags')
-		
-		
-		
-
+    sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@<REPO> --tags')		
             }
         }
         stage('Test') {
@@ -50,7 +33,3 @@ pipeline {
         }
     }
 }
-
-Код разместить в github
-Запуск пересборки осуществлять по пушу кода в мастер ветку репозитория
-Спасибо.
